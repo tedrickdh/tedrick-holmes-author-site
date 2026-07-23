@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import './styles.css';
 
 const AMAZON_AUTHOR_URL = 'https://www.amazon.com/Tedrick-Holmes/e/B0CHDWZK48';
+const GOOGLE_FORM_ENDPOINT =
+  "https://script.google.com/macros/s/AKfycbygIXoS29fUsDhnNVcB5eYQBzstIdu8F0dCTIF3p_R6B246mmcavmFBzH455evmJ6su/exec";
 
 const books = [
   {
@@ -229,7 +231,7 @@ function HomePage() {
       <section className="hero">
         <div className="hero-orb orb-one" /><div className="hero-orb orb-two" />
         <div className="container hero-grid">
-          <div className="hero-copy">
+          <div className="hero-copy cinematic-copy">
             <span className="eyebrow">Houston-born writer • Army veteran • Educator</span>
             <h1>Stories about what we inherit, what we survive, and who we become.</h1>
             <p>Tedrick Holmes writes fiction and personal narratives rooted in family, memory, community, history, and the complicated places people call home.</p>
@@ -238,7 +240,7 @@ function HomePage() {
               <NavLink to="/about"><span className="button secondary">Meet Tedrick</span></NavLink>
             </div>
           </div>
-          <div className="featured-stack">
+          <div className="featured-stack cinematic-book">
             <CoverImage book={books[0]} large />
             <div className="floating-quote">“The places that shape us deserve to be remembered honestly.”</div>
           </div>
@@ -306,55 +308,75 @@ function BookPage({ slug }) {
 }
 
 function AboutPage() {
+  const highlights = [
+    {
+      number: '20',
+      label: 'Years of military service',
+    },
+    {
+      number: 'Houston',
+      label: 'Born, raised, and shaped',
+    },
+    {
+      number: 'Author',
+      label: 'Fiction and personal narrative',
+    },
+    {
+      number: 'Leader',
+      label: 'Education, technology, and operations',
+    },
+  ];
+
+  const journey = [
+    {
+      title: 'Military service',
+      text:
+        'Tedrick served in the United States Army, where he developed his approach to leadership, technology, responsibility, and service.',
+    },
+    {
+      title: 'Technology and operations',
+      text:
+        'His professional career has included large-scale technology systems, organizational operations, project leadership, and team development.',
+    },
+    {
+      title: 'Education',
+      text:
+        'He later brought those experiences into education, working at the intersection of teaching, leadership, systems, and student opportunity.',
+    },
+    {
+      title: 'Writing',
+      text:
+        'His books explore family, memory, community, justice, inheritance, resilience, and the people whose stories are often oversimplified.',
+    },
+  ];
+
   return (
     <PageShell
       kicker="About Tedrick"
       title="A writer shaped by Houston, military service, education, leadership, and family."
-      intro="Tedrick Holmes writes with a broad view of how systems, neighborhoods, and personal choices shape ordinary lives."
+      intro="Tedrick Holmes writes with a broad view of how systems, neighborhoods, history, and personal choices shape ordinary lives."
     >
-      <div className="about-layout reveal">
-        <div className="portrait-panel">
+      <section className="about-feature reveal">
+        <div className="about-feature-image">
           <img
             src="/images/tedrick-holmes.jpg"
             alt="Tedrick Holmes"
             className="portrait-image"
           />
 
-          <div className="author-social-section">
-            <h3 className="social-title">Connect With Tedrick</h3>
-
-            <p className="social-subtitle">
-              Follow my writing journey, upcoming releases, and behind-the-scenes
-              updates.
+          <div className="about-image-caption">
+            <span>Houston, Texas</span>
+            <p>
+              Author, educator, Army veteran, technology leader, and
+              entrepreneur.
             </p>
-
-            <div className="author-social-links">
-              <a
-                href="https://www.facebook.com/tedrickdholmes"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="social-button"
-              >
-                Facebook
-              </a>
-
-              <a href="/books" className="social-button">
-                Books
-              </a>
-
-              <a href="/journal" className="social-button">
-                Journal
-              </a>
-
-              <a href="/contact" className="social-button">
-                Contact
-              </a>
-            </div>
           </div>
         </div>
 
-        <div className="prose">
-          <h2>Biography</h2>
+        <div className="about-feature-copy prose">
+          <span className="eyebrow">Biography</span>
+
+          <h2>Stories informed by a life spent moving between worlds.</h2>
 
           <p>
             Tedrick Holmes is a Houston-born author, retired U.S. Army veteran,
@@ -379,9 +401,69 @@ function AboutPage() {
             thought they understood.
           </p>
 
-          <h3>Selected background</h3>
+          <div className="button-row">
+            <NavLink to="/books">
+              <span className="button primary">Explore the books →</span>
+            </NavLink>
 
-          <ul>
+            <NavLink to="/contact">
+              <span className="button secondary">Contact Tedrick</span>
+            </NavLink>
+          </div>
+        </div>
+      </section>
+
+      <section className="about-highlights reveal">
+        {highlights.map((item) => (
+          <div className="about-highlight" key={item.label}>
+            <strong>{item.number}</strong>
+            <span>{item.label}</span>
+          </div>
+        ))}
+      </section>
+
+      <section className="about-journey reveal">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">The journey</span>
+            <h2>Experience across service, systems, classrooms, and stories.</h2>
+          </div>
+
+          <p>
+            Each stage of Tedrick&apos;s career has shaped the way he
+            approaches leadership, character, community, and storytelling.
+          </p>
+        </div>
+
+        <div className="about-journey-grid">
+          {journey.map((item, index) => (
+            <article className="about-journey-card" key={item.title}>
+              <span className="about-card-number">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="about-quote reveal">
+        <span className="eyebrow">A guiding idea</span>
+
+        <blockquote>
+          “The places we come from do not define our limits. They define our
+          foundation.”
+        </blockquote>
+      </section>
+
+      <section className="split-grid light-split about-bottom reveal">
+        <div>
+          <span className="eyebrow">Selected background</span>
+          <h2>Leadership grounded in lived experience.</h2>
+
+          <ul className="topic-list">
             <li>Houston native</li>
             <li>Retired U.S. Army noncommissioned officer</li>
             <li>Educator and education leader</li>
@@ -392,7 +474,24 @@ function AboutPage() {
             </li>
           </ul>
         </div>
-      </div>
+
+        <div className="inquiry-card">
+          <span className="eyebrow">Connect</span>
+          <h3>Speaking, interviews, schools, and book conversations</h3>
+
+          <p>
+            Tedrick is available for literary discussions, veteran and
+            leadership events, schools, universities, podcasts, panels, and
+            community conversations.
+          </p>
+
+          <NavLink to="/contact">
+            <span className="button primary">
+              Start a conversation →
+            </span>
+          </NavLink>
+        </div>
+      </section>
     </PageShell>
   );
 }
@@ -424,7 +523,144 @@ function MediaCard({ title, text }) { return <div className="media-card"><h3>{ti
 
 function ContactPage() {
   const [sent, setSent] = useState(false);
-  return <PageShell kicker="Contact" title="Let’s start a conversation." intro="For interviews, speaking requests, book events, media, publishing, film rights, or general questions, use the form below."><div className="contact-layout"><form className="contact-form" onSubmit={e => { e.preventDefault(); setSent(true); }}><div className="field-row"><label>Name<input required name="name" /></label><label>Email<input required type="email" name="email" /></label></div><label>Reason<select name="reason" defaultValue="General inquiry"><option>General inquiry</option><option>Speaking request</option><option>Book event</option><option>Media or interview</option><option>Rights or publishing</option></select></label><label>Message<textarea required rows="7" name="message" /></label><button className="button primary" type="submit">Send message</button>{sent && <p className="form-note">The design works. Connect this form to Resend or Formspree before publishing so it can deliver messages.</p>}</form><aside className="contact-aside"><h3>Before publishing</h3><p>Replace placeholder social links, connect the form, add your author photo, and add exact book purchase links.</p><a href={AMAZON_AUTHOR_URL} target="_blank" rel="noreferrer">Visit Amazon author page ↗</a></aside></div></PageShell>;
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    const formElement = e.currentTarget;
+    const form = new FormData(formElement);
+
+    const name = String(form.get("name") || "").trim();
+    const email = String(form.get("email") || "").trim();
+    const reason = String(form.get("reason") || "General inquiry").trim();
+    const message = String(form.get("message") || "").trim();
+
+    setSending(true);
+    setSent(false);
+    setError("");
+
+    try {
+      if (message.length < 5) {
+        throw new Error("Please enter a complete message.");
+      }
+
+      const body = new URLSearchParams({
+        name,
+        email,
+        reason,
+        message,
+        source: "tedrickholmes.com",
+      });
+
+      const response = await fetch(GOOGLE_FORM_ENDPOINT, {
+        method: "POST",
+        body,
+      });
+
+      const responseText = await response.text();
+      let data;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        throw new Error("Google returned an unreadable response.");
+      }
+
+      if (!data.success) {
+        throw new Error(data.message || "Your message could not be sent.");
+      }
+
+      formElement.reset();
+      setSent(true);
+    } catch (err) {
+      console.error("Contact form error:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Your message could not be sent. Please try again."
+      );
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <PageShell
+      kicker="Contact"
+      title="Let’s start a conversation."
+      intro="For interviews, speaking requests, book events, media, publishing, film rights, or general questions, use the form below."
+    >
+      <div className="contact-layout">
+        <form className="contact-form" onSubmit={handleSubmit}>
+          <div className="field-row">
+            <label>
+              Name
+              <input required name="name" />
+            </label>
+
+            <label>
+              Email
+              <input required type="email" name="email" />
+            </label>
+          </div>
+
+          <label>
+            Reason
+            <select name="reason" defaultValue="General inquiry">
+              <option>General inquiry</option>
+              <option>Speaking request</option>
+              <option>Book event</option>
+              <option>Media or interview</option>
+              <option>Rights or publishing</option>
+            </select>
+          </label>
+
+          <label>
+            Message
+            <textarea required minLength={5} rows={7} name="message" />
+          </label>
+
+          <button
+            className="button primary"
+            type="submit"
+            disabled={sending}
+          >
+            {sending ? "Sending..." : "Send message"}
+          </button>
+
+          {sent && (
+            <p className="form-note" role="status">
+              Thank you. Your message has been sent successfully.
+            </p>
+          )}
+
+          {error && (
+            <p className="form-note" role="alert">
+              {error}
+            </p>
+          )}
+        </form>
+
+        <aside className="contact-aside">
+          <h3>Get in touch</h3>
+          <p>
+            Use this form for interviews, speaking engagements, book events,
+            publishing inquiries, and general questions.
+          </p>
+
+          <a
+            href={AMAZON_AUTHOR_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Visit Amazon author page ↗
+          </a>
+        </aside>
+      </div>
+    </PageShell>
+  );
 }
 
 function Newsletter() {
