@@ -9,15 +9,26 @@ const CONFIG = {
   WEBSITE_URL: 'https://tedrickholmes.com',
 
   HEADERS: [
-    'Timestamp',
-    'Name',
-    'Email',
-    'Reason',
-    'Message',
-    'Status',
-    'Source',
-    'Notes',
-  ],
+  'Timestamp',
+  'Name',
+  'Email',
+  'Reason',
+  'Message',
+  'Status',
+  'Source',
+  'Notes',
+],
+
+MEMORY_SHEET_NAME: 'Memory Submissions',
+
+MEMORY_HEADERS: [
+  'Timestamp',
+  'Address',
+  'City',
+  'Memory',
+  'Status',
+  'Notes',
+],
 };
 
 function setupWebsiteContactSystem() {
@@ -68,7 +79,53 @@ function setupWebsiteContactSystem() {
   }
 
   setupLeadSheet_(sheet);
+  let memorySheet =
+  spreadsheet.getSheetByName(CONFIG.MEMORY_SHEET_NAME);
 
+if (!memorySheet) {
+  memorySheet = spreadsheet.insertSheet(
+    CONFIG.MEMORY_SHEET_NAME
+  );
+}
+
+setupMemorySheet_(memorySheet);
+
+function setupMemorySheet_(sheet) {
+
+  const headerRange = sheet.getRange(
+    1,
+    1,
+    1,
+    CONFIG.MEMORY_HEADERS.length
+  );
+
+  headerRange
+    .setValues([CONFIG.MEMORY_HEADERS])
+    .setFontWeight('bold')
+    .setBackground('#2e4d33')
+    .setFontColor('#ffffff')
+    .setHorizontalAlignment('center');
+
+  sheet.setFrozenRows(1);
+
+  sheet.setColumnWidth(1,180);
+  sheet.setColumnWidth(2,280);
+  sheet.setColumnWidth(3,220);
+  sheet.setColumnWidth(4,650);
+  sheet.setColumnWidth(5,120);
+  sheet.setColumnWidth(6,260);
+
+  const validation =
+    SpreadsheetApp.newDataValidation()
+      .requireValueInList(
+        ['New','Reviewed','Featured','Archived'],
+        true
+      )
+      .build();
+
+  sheet.getRange("E2:E").setDataValidation(validation);
+
+}
   properties.setProperty(
     'CONTACT_SPREADSHEET_URL',
     spreadsheet.getUrl()
@@ -159,7 +216,9 @@ function doGet() {
 function doPost(event) {
   try {
     const data = parseRequest_(event);
-
+if (data.formType === "memory") {
+  return handleMemorySubmission_(data);
+}
     const name = sanitize_(data.name, 150);
     const email = sanitize_(data.email, 250).toLowerCase();
     const reason = sanitize_(
@@ -263,7 +322,20 @@ function getLeadSheet_() {
 
   return sheet;
 }
+function getMemorySheet_() {
 
+  const spreadsheetId =
+    PropertiesService.getScriptProperties()
+      .getProperty("CONTACT_SPREADSHEET_ID");
+
+  const spreadsheet =
+    SpreadsheetApp.openById(spreadsheetId);
+
+  return spreadsheet.getSheetByName(
+    CONFIG.MEMORY_SHEET_NAME
+  );
+
+}
 function parseRequest_(event) {
   if (!event) {
     throw new Error('No request data was received.');
@@ -397,7 +469,54 @@ function sendVisitorConfirmation_({
     }
   );
 }
+function handleMemorySubmission_(data) {
 
+  const address = sanitize_(data.address,300);
+  const city = sanitize_(data.city,200);
+  const memory = sanitize_(data.memory,8000);
+
+  if (!address)
+    throw new Error("Address is required.");
+
+  if (!city)
+    throw new Error("City is required.");
+
+  if (memory.length < 20)
+    throw new Error("Memory is too short.");
+
+  const sheet = getMemorySheet_();
+
+  sheet.appendRow([
+    new Date(),
+    address,
+    city,
+    memory,
+    "New",
+    ""
+  ]);
+
+  GmailApp.sendEmail(
+    CONFIG.NOTIFICATION_EMAIL,
+
+    "New Memory Project Submission",
+
+    [
+      "A visitor submitted a memory.",
+      "",
+      "Address: " + address,
+      "City: " + city,
+      "",
+      "Memory:",
+      memory
+    ].join("\n")
+  );
+
+  return jsonResponse_({
+    success:true,
+    message:"Memory received."
+  });
+
+}
 function jsonResponse_(payload) {
   return ContentService
     .createTextOutput(JSON.stringify(payload))

@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './styles.css';
+import HomeHero from "./components/HomeHero";
+import MemoryProject from "./components/MemoryProject";
 
 const AMAZON_AUTHOR_URL = 'https://www.amazon.com/Tedrick-Holmes/e/B0CHDWZK48';
 const GOOGLE_FORM_ENDPOINT =
@@ -108,26 +110,81 @@ function NavLink({ to, children, onClick }) {
 
 function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
   const close = () => setOpen(false);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 24);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <header className="site-header">
+    <header
+      className={`site-header ${scrolled ? "site-header-scrolled" : ""}`}
+    >
       <div className="container nav-shell">
         <NavLink to="/" onClick={close}>
           <span className="brand">
             <span className="brand-mark">TH</span>
-            <span><strong>Tedrick Holmes</strong><small>Author & Storyteller</small></span>
+
+            <span className="brand-copy">
+              <strong>Tedrick Holmes</strong>
+              <small>Author · Educator · Veteran</small>
+            </span>
           </span>
         </NavLink>
-        <button className="menu-button" onClick={() => setOpen(!open)} aria-label="Toggle menu">{open ? 'Close' : 'Menu'}</button>
-        <nav className={open ? 'nav open' : 'nav'}>
-          <NavLink to="/books" onClick={close}>Books</NavLink>
-          <NavLink to="/about" onClick={close}>About</NavLink>
-          <NavLink to="/journal" onClick={close}>Journal</NavLink>
-          <NavLink to="/speaking" onClick={close}>Speaking</NavLink>
-          <NavLink to="/media" onClick={close}>Media Kit</NavLink>
-          <NavLink to="/contact" onClick={close}>Contact</NavLink>
+
+        <button
+          className="menu-button"
+          type="button"
+          onClick={() => setOpen((current) => !current)}
+          aria-label="Toggle navigation menu"
+          aria-expanded={open}
+        >
+          {open ? "Close" : "Menu"}
+        </button>
+
+        <nav className={open ? "nav open" : "nav"}>
+          <NavLink to="/books" onClick={close}>
+            Books
+          </NavLink>
+
+          <NavLink to="/journal" onClick={close}>
+            Journal
+          </NavLink>
+
+          <NavLink to="/about" onClick={close}>
+            About
+          </NavLink>
+
+          <NavLink to="/speaking" onClick={close}>
+            Speaking
+          </NavLink>
+
+          <NavLink to="/media" onClick={close}>
+            Media
+          </NavLink>
+
+          <NavLink to="/contact" onClick={close}>
+            Contact
+          </NavLink>
         </nav>
+
+        <NavLink to="/books/from-kitty-hawk" onClick={close}>
+          <span className="header-project-link">
+            <small>Featured story</small>
+            <strong>From Kitty Hawk →</strong>
+          </span>
+        </NavLink>
       </div>
     </header>
   );
@@ -225,46 +282,419 @@ function ScrollAnimations() {
 
   return null;
 }
+function LanternIcon() {
+  return (
+    <svg
+      className="lantern-svg"
+      viewBox="0 0 180 260"
+      role="img"
+      aria-label="Glowing lantern"
+    >
+      <defs>
+        <radialGradient id="lanternLight" cx="50%" cy="45%" r="55%">
+          <stop offset="0%" stopColor="#fff8d2" />
+          <stop offset="45%" stopColor="#f7c56a" />
+          <stop offset="100%" stopColor="#b86726" />
+        </radialGradient>
+
+        <linearGradient id="lanternFrame" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#7f522f" />
+          <stop offset="50%" stopColor="#25160f" />
+          <stop offset="100%" stopColor="#93623a" />
+        </linearGradient>
+
+        <filter id="lanternGlow" x="-150%" y="-150%" width="400%" height="400%">
+          <feGaussianBlur stdDeviation="12" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <path
+        className="lantern-handle"
+        d="M52 65C52 17 128 17 128 65"
+        fill="none"
+        stroke="url(#lanternFrame)"
+        strokeWidth="10"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M49 66H131L143 94H37L49 66Z"
+        fill="url(#lanternFrame)"
+      />
+
+      <rect
+        x="42"
+        y="91"
+        width="96"
+        height="116"
+        rx="18"
+        fill="#180f0c"
+        stroke="#7a4d2e"
+        strokeWidth="7"
+      />
+
+      <rect
+        className="lantern-light"
+        x="57"
+        y="106"
+        width="66"
+        height="86"
+        rx="20"
+        fill="url(#lanternLight)"
+        filter="url(#lanternGlow)"
+      />
+
+      <path
+        d="M37 205H143L132 230H48L37 205Z"
+        fill="url(#lanternFrame)"
+      />
+
+      <rect
+        x="77"
+        y="228"
+        width="26"
+        height="14"
+        rx="5"
+        fill="#25160f"
+      />
+
+      <path
+        d="M48 96L60 204M132 96L120 204"
+        stroke="#8e5b35"
+        strokeWidth="5"
+        opacity="0.8"
+      />
+    </svg>
+  );
+}
+
+function CinematicHero() {
+  const heroRef = useRef(null);
+
+  useEffect(() => {
+    const hero = heroRef.current;
+
+    if (!hero) {
+      return undefined;
+    }
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      return undefined;
+    }
+
+    const handlePointerMove = (event) => {
+      const rect = hero.getBoundingClientRect();
+
+      const relativeX = (event.clientX - rect.left) / rect.width;
+      const relativeY = (event.clientY - rect.top) / rect.height;
+
+      const x = (relativeX - 0.5) * 2;
+      const y = (relativeY - 0.5) * 2;
+
+      hero.style.setProperty("--pointer-x", x.toFixed(3));
+      hero.style.setProperty("--pointer-y", y.toFixed(3));
+    };
+
+    const resetPointer = () => {
+      hero.style.setProperty("--pointer-x", "0");
+      hero.style.setProperty("--pointer-y", "0");
+    };
+
+    hero.addEventListener("pointermove", handlePointerMove);
+    hero.addEventListener("pointerleave", resetPointer);
+
+    return () => {
+      hero.removeEventListener("pointermove", handlePointerMove);
+      hero.removeEventListener("pointerleave", resetPointer);
+    };
+  }, []);
+
+  const scrollToStories = () => {
+    document
+      .getElementById("featured-work")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <section
+      ref={heroRef}
+      className="hero cinematic-hero"
+      aria-labelledby="home-hero-title"
+    >
+      <div className="hero-sky" aria-hidden="true" />
+      <div className="hero-stars hero-stars-far" aria-hidden="true" />
+      <div className="hero-stars hero-stars-near" aria-hidden="true" />
+
+      <div className="hero-horizon" aria-hidden="true">
+        <div className="horizon-building building-one" />
+        <div className="horizon-building building-two" />
+        <div className="horizon-building building-three" />
+        <div className="horizon-building building-four" />
+        <div className="horizon-building building-five" />
+      </div>
+
+      <div className="hero-fog fog-back" aria-hidden="true" />
+      <div className="hero-fog fog-front" aria-hidden="true" />
+      <div className="hero-gradient" aria-hidden="true" />
+
+      <div className="hero-lantern" aria-hidden="true">
+        <div className="lantern-aura" />
+        <div className="lantern-swing">
+          <LanternIcon />
+        </div>
+      </div>
+
+      <div className="container hero-grid cinematic-hero-grid">
+        <div className="hero-copy cinematic-copy">
+          <span className="eyebrow hero-eyebrow">
+            Houston-born writer · Army veteran · Educator
+          </span>
+
+          <h1 id="home-hero-title">
+            Stories built
+            <span>from memory.</span>
+          </h1>
+
+          <p>
+            Every neighborhood leaves fingerprints. Every family carries
+            history. Every generation inherits something.
+          </p>
+
+          <div className="button-row">
+            <NavLink to="/books">
+              <span className="button primary">Enter the stories →</span>
+            </NavLink>
+
+            <NavLink to="/about">
+              <span className="button secondary hero-secondary-button">
+                Meet Tedrick
+              </span>
+            </NavLink>
+          </div>
+        </div>
+
+        <div className="featured-stack cinematic-book hero-featured-book">
+          <div className="book-light" aria-hidden="true" />
+
+          <CoverImage book={books[0]} large />
+
+          <div className="floating-quote">
+            “The places that shape us deserve to be remembered honestly.”
+          </div>
+        </div>
+      </div>
+
+      <button
+        className="scroll-indicator"
+        type="button"
+        onClick={scrollToStories}
+        aria-label="Scroll to featured books"
+      >
+        <span className="scroll-line" />
+        <span className="scroll-label">Discover</span>
+      </button>
+    </section>
+  );
+}
+function StoryQuote() {
+  return (
+    <section className="story-quote reveal" aria-label="Author quote">
+      <div className="story-quote-glow" aria-hidden="true" />
+
+      <div className="container story-quote-inner">
+        <span className="story-quote-mark" aria-hidden="true">
+          “
+        </span>
+
+        <blockquote>
+          The places we leave
+          <span>never really leave us.</span>
+        </blockquote>
+
+        <p>— Tedrick Holmes</p>
+      </div>
+    </section>
+  );
+}
+function FeaturedBook() {
+  const book = books[0];
+
+  return (
+    <section className="featured-bookcase reveal">
+      <div className="container featured-book-layout">
+
+        <div className="featured-book-cover">
+          <CoverImage book={book} large />
+        </div>
+
+        <div className="featured-book-copy">
+
+          <span className="eyebrow">
+            Featured Novel
+          </span>
+
+          <h2>{book.title}</h2>
+
+          <p className="lead">
+            {book.long}
+          </p>
+
+          <div className="tag-list">
+            {book.themes.map(theme => (
+              <span key={theme}>{theme}</span>
+            ))}
+          </div>
+
+          <div className="button-row">
+
+            <NavLink to={`/books/${book.slug}`}>
+              <span className="button primary">
+                Explore the Story →
+              </span>
+            </NavLink>
+
+            <a
+              href={book.buyUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="button secondary"
+            >
+              Amazon ↗
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  );
+}
+function AuthorJourney() {
+  const milestones = [
+    {
+      number: "01",
+      title: "Houston",
+      text: "Born and shaped by the neighborhoods, families, humor, pressure, and possibility of Houston.",
+    },
+    {
+      number: "02",
+      title: "Army",
+      text: "Twenty years of military service built a foundation of leadership, responsibility, resilience, and service.",
+    },
+    {
+      number: "03",
+      title: "Technology",
+      text: "A career managing systems, operations, infrastructure, teams, and complex organizational challenges.",
+    },
+    {
+      number: "04",
+      title: "Education",
+      text: "Bringing leadership and systems thinking into schools, classrooms, and community-centered work.",
+    },
+    {
+      number: "05",
+      title: "Author",
+      text: "Writing stories about memory, history, justice, family, place, and the lives people too often misunderstand.",
+    },
+  ];
+
+  return (
+    <section className="author-journey">
+      <div className="container">
+        <div className="author-journey-heading reveal">
+          <span className="eyebrow">The journey</span>
+
+          <h2>
+            Every chapter shaped
+            <span>the stories that followed.</span>
+          </h2>
+
+          <p>
+            Tedrick Holmes writes from a life lived across neighborhoods,
+            military installations, technology systems, classrooms, leadership
+            roles, and community work.
+          </p>
+        </div>
+
+        <div className="journey-track">
+          <div className="journey-line" aria-hidden="true" />
+
+          {milestones.map((milestone) => (
+            <article className="journey-stop reveal" key={milestone.title}>
+              <div className="journey-marker">
+                <span>{milestone.number}</span>
+              </div>
+
+              <div className="journey-copy">
+                <h3>{milestone.title}</h3>
+                <p>{milestone.text}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="journey-action reveal">
+          <NavLink to="/about">
+            <span className="button secondary">
+              Read the full biography →
+            </span>
+          </NavLink>
+        </div>
+      </div>
+    </section>
+  );
+}
 function HomePage() {
   return (
     <>
-      <section className="hero">
-        <div className="hero-orb orb-one" /><div className="hero-orb orb-two" />
-        <div className="container hero-grid">
-          <div className="hero-copy cinematic-copy">
-            <span className="eyebrow">Houston-born writer • Army veteran • Educator</span>
-            <h1>Stories about what we inherit, what we survive, and who we become.</h1>
-            <p>Tedrick Holmes writes fiction and personal narratives rooted in family, memory, community, history, and the complicated places people call home.</p>
-            <div className="button-row">
-              <NavLink to="/books"><span className="button primary">Explore the books →</span></NavLink>
-              <NavLink to="/about"><span className="button secondary">Meet Tedrick</span></NavLink>
-            </div>
-          </div>
-          <div className="featured-stack cinematic-book">
-            <CoverImage book={books[0]} large />
-            <div className="floating-quote">“The places that shape us deserve to be remembered honestly.”</div>
-          </div>
+     <HomeHero book={books[0]} />
+
+<StoryQuote />
+
+<section className="section" id="featured-work">
+        <div className="container">
+          <FeaturedBook />
+
+<SectionHeading
+    kicker="More Stories"
+    title="Explore the collection"
+/>
+
+<div className="books-grid">
+    {books.slice(1).map(book => (
+        <BookCard
+            key={book.slug}
+            book={book}
+        />
+    ))}
+</div>
         </div>
       </section>
+
+      <AuthorJourney />
 
       <section className="section">
         <div className="container">
-          <SectionHeading kicker="Featured work" title="Books and stories by Tedrick Holmes" text="Literary fiction, speculative storytelling, and personal history grounded in real emotion and lived experience." />
-          <div className="books-grid">{books.map(book => <BookCard key={book.slug} book={book} />)}</div>
-        </div>
-      </section>
+          <MemoryProject />
+          <SectionHeading
+            kicker="From the journal"
+            title="Notes on writing, memory, and the work"
+          />
 
-      <section className="section dark-band">
-        <div className="container split-grid">
-          <div><span className="eyebrow">About the author</span><h2>Writing from the intersection of memory, service, education, and community.</h2></div>
-          <div><p>A Houston native and retired Army veteran, Tedrick brings decades of leadership, education, technology, and community experience to his writing.</p><NavLink to="/about"><span className="text-link light">Read the full biography →</span></NavLink></div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <SectionHeading kicker="From the journal" title="Notes on writing, memory, and the work" />
-          <div className="journal-grid">{journalPosts.map(post => <JournalCard key={post.slug} post={post} />)}</div>
+          <div className="journal-grid">
+            {journalPosts.map((post) => (
+              <JournalCard key={post.slug} post={post} />
+            ))}
+          </div>
         </div>
       </section>
 
