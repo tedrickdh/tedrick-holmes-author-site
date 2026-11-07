@@ -292,15 +292,15 @@ function LanternIcon() {
     >
       <defs>
         <radialGradient id="lanternLight" cx="50%" cy="45%" r="55%">
-          <stop offset="0%" stopColor="#fff8d2" />
-          <stop offset="45%" stopColor="#f7c56a" />
-          <stop offset="100%" stopColor="#b86726" />
+          <stop offset="0%" stopColor="#F7E3DC" />
+          <stop offset="45%" stopColor="#D89A9E" />
+          <stop offset="100%" stopColor="#8C2F38" />
         </radialGradient>
 
         <linearGradient id="lanternFrame" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#7f522f" />
-          <stop offset="50%" stopColor="#25160f" />
-          <stop offset="100%" stopColor="#93623a" />
+          <stop offset="0%" stopColor="#52211B" />
+          <stop offset="50%" stopColor="#2A1210" />
+          <stop offset="100%" stopColor="#6E2C22" />
         </linearGradient>
 
         <filter id="lanternGlow" x="-150%" y="-150%" width="400%" height="400%">
@@ -332,8 +332,8 @@ function LanternIcon() {
         width="96"
         height="116"
         rx="18"
-        fill="#180f0c"
-        stroke="#7a4d2e"
+        fill="#120C09"
+        stroke="#4A1D1A"
         strokeWidth="7"
       />
 
@@ -359,12 +359,12 @@ function LanternIcon() {
         width="26"
         height="14"
         rx="5"
-        fill="#25160f"
+        fill="#2A1210"
       />
 
       <path
         d="M48 96L60 204M132 96L120 204"
-        stroke="#8e5b35"
+        stroke="#5E2320"
         strokeWidth="5"
         opacity="0.8"
       />
