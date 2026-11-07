@@ -903,6 +903,15 @@ function AboutPage() {
               Contributor to <em>Our Shades of Black History</em>
             </li>
           </ul>
+
+          <p>
+            Through Au-Some Teacher ABA Services, Tedrick partners with
+            Founder &amp; Clinical Director{' '}
+            <a href="https://au-someteacher.com/rosalyn-holmes">
+              <strong>Rosalyn Holmes, BCBA</strong>
+            </a>
+            , to connect clinical leadership with sustainable operations.
+          </p>
         </div>
 
         <div className="inquiry-card">
