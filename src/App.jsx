@@ -41,12 +41,13 @@ const books = [
     title: 'Our Shades of Black History',
     eyebrow: 'Anthology contribution',
     status: 'Published',
+    publisher: 'JumpTime Publishing',
     cover: '/covers/our-shades-of-black-history.png',
     fallback: 'OSBH',
     summary:
-      'Individual stories from Black men and women, including Tedrick Holmes’s reflections on perseverance, service, and community.',
+      'Individual stories from Black men and women, including Tedrick Holmes’s reflections on perseverance, service, and community. A collaborative anthology published by JumpTime Publishing.',
     long:
-      'This anthology gathers personal accounts from Black contributors who chose to preserve a piece of their history. Tedrick Holmes contributes a story shaped by family, military service, education, leadership, and the communities that helped him keep moving forward.',
+      'This collaborative anthology, published by JumpTime Publishing in 2023, gathers personal accounts from Black contributors who chose to preserve a piece of their history. Tedrick Holmes contributes “From Trials to Triumph: A Journey of Perseverance and Community,” a story shaped by family, military service, education, leadership, and the communities that helped him keep moving forward.',
     themes: ['Black history', 'Memoir', 'Service', 'Perseverance', 'Community'],
     buyUrl: AMAZON_AUTHOR_URL,
   },
@@ -250,6 +251,7 @@ function BookCard({ book }) {
         <span className="eyebrow">{book.status}</span>
         <h3>{book.title}</h3>
         <p>{book.summary}</p>
+        {book.publisher && <p><strong>Publisher:</strong> {book.publisher}</p>}
         <div className="card-actions">
           <NavLink to={`/books/${book.slug}`}><span className="text-link">Book details →</span></NavLink>
           <a href={book.buyUrl} target="_blank" rel="noreferrer">Amazon ↗</a>
@@ -727,6 +729,7 @@ function BookPage({ slug }) {
             <span className="eyebrow">{book.eyebrow}</span>
             <h1>{book.title}</h1>
             <p className="lead">{book.long}</p>
+            {book.publisher && <p><strong>Publisher:</strong> {book.publisher}</p>}
             <div className="tag-list">{book.themes.map(theme => <span key={theme}>{theme}</span>)}</div>
             <div className="button-row"><a className="button primary" href={book.buyUrl} target="_blank" rel="noreferrer">View on Amazon ↗</a><NavLink to="/contact"><span className="button secondary">Media or rights inquiry</span></NavLink></div>
           </div>
@@ -900,7 +903,7 @@ function AboutPage() {
             <li>Technology and operations professional</li>
             <li>Entrepreneur and community advocate</li>
             <li>
-              Contributor to <em>Our Shades of Black History</em>
+              Contributor to <em>Our Shades of Black History</em> (JumpTime Publishing)
             </li>
           </ul>
 
